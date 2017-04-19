@@ -1,4 +1,12 @@
+# ==============================================================================
+# Author Yan Feng
+# Create Date 2017/4/21
+# github.com/Brooklynyan/Tensorflow_notebook
+# Programmed for Tensorflow Cifar10 dataset CNN tutorial learning
+# Windows Platform
+# ==============================================================================
 
+""" Recover the cifar10 dataset to png file format from original cpickle files"""
 
 import os
 import numpy as np
@@ -27,30 +35,42 @@ def get_image_pixel_array(array):                                  # return the 
     return varray
 
 
-data_path = "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\data_batch_1"
-meta_path = "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\batches.meta"
-root_path = "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\test"
+def generate_images(rootpath, batchno, data_array, label_array, labelname_array):      # generates png files
+    for image in enumerate(data_array):
+        i = image[0]
+        img = image[1]
+        label = label_array[i]
+        labelname = labelname_array[label]
+        path = rootpath + "\\cifar10_image\\" + labelname + "\\" + str(batchno) + "_" + str(i) + ".png"
+        cv.imwrite(path, get_image_pixel_array(img))
 
+
+data_path = {"E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\data_batch_1",      # train data batch file path
+             "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\data_batch_2",
+             "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\data_batch_3",
+             "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\data_batch_4",
+             "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\data_batch_5"}
+
+meta_path = "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\batches.meta"        # batches.meta path
+root_path = "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\train"                # train image root folder path
 labelnames = list(map(lambda x: str(x).replace("b'", "", 1).replace("'", "", 1), readfile(meta_path)[b'label_names']))
-batch_data = readfile(data_path)[b'data']
-batch_data_labels = readfile(data_path)[b'labels']
-batch_no = data_path[-1:]
 
-create_image_folder(root_path, labelnames)
+create_image_folder(root_path, labelnames)                                            # create train sub folders
 
-for image in enumerate(batch_data):
-    i = image[0]
-    img = image[1]
-    label = batch_data_labels[i]
-    labelname = labelnames[label]
-    path = root_path+"\\cifar10_image\\"+labelname+"\\"+str(batch_no)+"_"+str(i)+".png"
-    cv.imwrite(path, get_image_pixel_array(img))
+for v_path in data_path:                                                             # generate train images
+    batch_data = readfile(v_path)[b'data']
+    batch_data_labels = readfile(v_path)[b'labels']
+    batch_no = v_path[-1:]
+    generate_images(root_path, batch_no, batch_data, batch_data_labels, labelnames)
 
-#print(readfile(data_path)[b'labels'])
-#print(get_image_pixel_array(readfile(data_path)[b'data'][1]))
-#print(np.array(readfile(data_path)[b'data'][1]).__len__())
-#print(readfile(data_path)[b'batch_label'])
-#print(readfile(data_path).keys())
-#print(readfile(meta_path)[b'label_names'])
+data_path = {"E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\test_batch"}        # test data batch file path
+root_path = "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\test"                # test image root folder path
 
-#cv.imwrite("D:\\test.png",get_image_pixel_array(readfile(file_path)[b'data'][1]))
+create_image_folder(root_path, labelnames)                                            # create test sub folders
+
+for v_path in data_path:                                                             # generate test images
+    batch_data = readfile(v_path)[b'data']
+    batch_data_labels = readfile(v_path)[b'labels']
+    batch_no = 1
+    generate_images(root_path, batch_no, batch_data, batch_data_labels, labelnames)
+
