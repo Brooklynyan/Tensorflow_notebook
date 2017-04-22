@@ -49,6 +49,7 @@ def get_file_pathlist(rootpath):
 
 def convert_to_tfr(data_list, path):
     leng = datalist.__len__()
+    writer = tf.python_io.TFRecordWriter(path)
     for data in enumerate(data_list):
         no = data[0]
         image = data[1]['raw']
@@ -57,7 +58,6 @@ def convert_to_tfr(data_list, path):
         cols = data[1]['col']
         depth = data[1]['depth']
         print(str(no+1)+" of "+str(leng)+" has been processed.")
-        writer = tf.python_io.TFRecordWriter(path)
         image = image.tostring()
         example = tf.train.Example(features=tf.train.Features(feature={
             'height': _int64_feature(rows),
@@ -72,7 +72,7 @@ def convert_to_tfr(data_list, path):
 
 
 
-root_path = "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\train\\cifar10_image\\airplane"
+root_path = "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\train\\cifar10_image\\airplane_test"
 
 path_list = get_file_pathlist(root_path)
 labelcode = 0
