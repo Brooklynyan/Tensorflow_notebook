@@ -1,10 +1,17 @@
+# ==============================================================================
+# Author Yan Feng
+# Create Date 2017/4/23
+# github.com/Brooklynyan/Tensorflow_notebook
+# Programmed for Tensorflow Cifar10 dataset CNN tutorial learning
+# Windows Platform
+# ==============================================================================
 
-
+""" Convert the cifar10 dataset from png file format to standard tfrecords file format"""
 
 
 import tensorflow as tf
 import cv2 as cv
-import numpy
+import pickle as pkl
 import os
 
 
@@ -16,7 +23,7 @@ def _bytes_feature(value):
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
 
-def load_image(path, label):
+def load_image(path, label):                                                  # load single png file return dict
     dic = {'label': None, 'row': 0, 'col': 0, 'depth': 0, 'raw': None}
     img = cv.imread(path)
     row = img.shape[0]
@@ -30,7 +37,7 @@ def load_image(path, label):
     return dic
 
 
-def bulk_load_buffer(pathlist, labelist, loadmethod):
+def bulk_load_buffer(pathlist, labelist, loadmethod):                        # bulk load images to buffer
     data_list = []
     for path in enumerate(pathlist):
         label = labelist[path[0]]
@@ -38,7 +45,7 @@ def bulk_load_buffer(pathlist, labelist, loadmethod):
     return data_list
 
 
-def get_file_pathlist(rootpath):
+def get_file_pathlist(rootpath):                                             # push png file paths into a list
     pathlist = []
     for dirname, sub, filename in os.walk(rootpath):
         for name in filename:
@@ -47,8 +54,8 @@ def get_file_pathlist(rootpath):
     return pathlist
 
 
-def convert_to_tfr(data_list, path):
-    leng = datalist.__len__()
+def convert_to_tfr(data_list, path):                                         # write records into single tfr file
+    leng = data_list.__len__()
     writer = tf.python_io.TFRecordWriter(path)
     for data in enumerate(data_list):
         no = data[0]
@@ -69,17 +76,26 @@ def convert_to_tfr(data_list, path):
     writer.close()
 
 
+def readfile(filepath):                                               # read cpickle file and get numpy ndarray
+    file = open(filepath, 'rb')
+    dic = pkl.load(file, encoding='bytes')
+    file.close()
+    return dic
 
 
+root_path = "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\train\\cifar10_image"
+meta_path = "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\batches.meta"                   # batches.meta path
+tfr_path = "E:\\Cifar10\\Train"
+labelnames = list(map(lambda x: str(x).replace("b'", "", 1).replace("'", "", 1), readfile(meta_path)[b'label_names']))
 
-root_path = "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\train\\cifar10_image\\airplane_test"
-
-path_list = get_file_pathlist(root_path)
-labelcode = 0
-label_list = [int(i/i)*labelcode for i in range(1, path_list.__len__()+1)]
-#method = load_image
-datalist = bulk_load_buffer(path_list,label_list,load_image)
-convert_to_tfr(datalist,"E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\train\\cifar10_image\\1_one\\airplane.tfrecords")
-
+for root, subpath, file_name in os.walk(root_path):
+    for vsub in subpath:
+        flag = vsub
+        vpath = os.path.join(root, vsub)
+        label_value = labelnames.index(flag)
+        path_list = get_file_pathlist(vpath)
+        label_list = [int(i / i) * label_value for i in range(1, path_list.__len__() + 1)]
+        datalist = bulk_load_buffer(path_list, label_list, load_image)
+        convert_to_tfr(datalist, tfr_path+"\\batch_"+str(label_value)+".tfrecords")
 
 

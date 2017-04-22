@@ -40,8 +40,10 @@ def tfr_recover_data(filename):                                          # recov
 
 
 
-file_name = "E:\\DownLoad\\cifar-10-python\\cifar-10-batches-py\\train\\cifar10_image\\1_one\\airplane.tfrecords"
-print(tfr_recover_data(file_name))
+file_name = "E:\\cifar10\\train\\batch_0.tfrecords"
+ddd = tfr_recover_data(file_name)
+print(ddd)
+print(ddd['image'].__len__(),ddd['label'].__len__())
 
 """with tf.name_scope('input'):
     filename_queue = tf.train.string_input_producer(
