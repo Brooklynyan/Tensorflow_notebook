@@ -1,6 +1,12 @@
+# ==============================================================================
+# Author Yan Feng
+# Create Date 2017/4/24
+# github.com/Brooklynyan/Tensorflow_notebook
+# Programmed for Tensorflow Cifar10 dataset CNN tutorial learning
+# Windows Platform
+# ==============================================================================
 
-
-
+""" Validate the cifar10 dataset from tfrecords file """
 
 
 import tensorflow as tf
@@ -24,10 +30,10 @@ def tfr_recover_data(filename):                                          # recov
         datalist['width'].append(example['width'])
         datalist['depth'].append(example['depth'])
 
-    sess = tf.Session()
-    sess.run(tf.global_variables_initializer())
-    recv = sess.run(datalist)
-    sess.close()
+    sess = tf.Session()                                                     # open a tf session
+    sess.run(tf.global_variables_initializer())                             # initialize session global variables
+    recv = sess.run(datalist)                                               # get the numpy array by running tf node
+    sess.close()                                                            # close tf session
 
     result = {'image': [], 'label': []}
     for arr in enumerate(recv['image_raw']):
@@ -39,58 +45,7 @@ def tfr_recover_data(filename):                                          # recov
     return result
 
 
-
 file_name = "E:\\cifar10\\train\\batch_0.tfrecords"
-ddd = tfr_recover_data(file_name)
-print(ddd)
-print(ddd['image'].__len__(),ddd['label'].__len__())
-
-"""with tf.name_scope('input'):
-    filename_queue = tf.train.string_input_producer(
-        [filename], num_epochs=1)"""
-
-"""reader = tf.TFRecordReader()
-_, serialized_example = reader.read(filename_queue)
-features = tf.parse_single_example(
-      serialized_example,
-      # Defaults are not specified since both keys are required.
-      features={
-          'image_raw': tf.FixedLenFeature([], tf.string),
-          'label': tf.FixedLenFeature([], tf.int64),
-      })
-image = tf.decode_raw(features['image_raw'], tf.uint8)
-image.set_shape([3072])
-image = tf.cast(image, tf.float32)
-v = tf.constant(image)
-print(v)"""
-
-'''features1={
-          'image_raw': tf.FixedLenFeature([], tf.string)}
-features2={
-          'label': tf.FixedLenFeature([], tf.int64)}
-data1 = []
-data2 = []
-for s_example in tf.python_io.tf_record_iterator(filename):
- example1 = tf.parse_single_example(s_example, features=features1)
- example2 = tf.parse_single_example(s_example, features=features2)
- img = tf.decode_raw(example1['image_raw'],tf.uint8)
- data1.append(img)
-
-print (data1.__len__())
-
-with tf.Session() as sess:
-    sess.run(tf.global_variables_initializer())
-    Y = sess.run([data1])
-    print(npY)
-    #print(np.array(Y[0]).reshape(32,32,3))
-    print(Y[0][0].__len__())'''
-
-
-
-#sess = tf.Session()
-#print(sess.run(v))
-
-
-
-
-
+img_data = tfr_recover_data(file_name)
+print(img_data)
+print(img_data['image'].__len__(), img_data['label'].__len__())
